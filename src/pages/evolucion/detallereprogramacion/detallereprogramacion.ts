@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { AlertController, IonicPage, NavController, NavParams } from 'ionic-angular';
 
-import { TipoincideciasProvider } from '../../../providers/tipoincidecias/tipoincidecias';
 import { BloquehorariosProvider } from '../../../providers/bloquehorarios/bloquehorarios';
-import { AgendareproProvider } from '../../../providers/agendarepro/agendarepro'
-import { AppservicioProvider } from '../../../providers/appservicio/appservicio';
+import { AgendareproProvider }    from '../../../providers/agendarepro/agendarepro';
+import { AppservicioProvider }    from '../../../providers/appservicio/appservicio';
 import { ServicioPage } from '../../servicio/servicio';
 
 @IonicPage()
@@ -36,7 +35,6 @@ export class DetallereprogramacionPage {
   	public navCtrl: NavController, 
   	public navParams: NavParams,
     public alertCtrl: AlertController,
-  	public tipoincidenciasProv: TipoincideciasProvider,
     public horariosProv: BloquehorariosProvider,
     public reprosProv: AgendareproProvider,
   	public serviApp: AppservicioProvider) { 
@@ -129,81 +127,7 @@ export class DetallereprogramacionPage {
     editar.present();
   }
 
-  async getTipoIncidencias(): Promise<void> {
-    let metodo = ': metodo getTipoIncidencias';
-    this.serviApp.activarProgreso(true,this.TAG + metodo);
-    await this.tipoincidenciasProv.getAll()
-      .subscribe(
-      (res)=>{
-        console.log(res['data'])
-        let objetos: any[] = res['data'].motivos || [];
-        console.log(res['data'].motivos)
-        if (objetos.length != 0){
-          let myImputs:any =[];
-          for ( let i in objetos ){
-            let data:any = { 
-              type: 'radio',
-              label: objetos[i].descripcion,
-              value: objetos[i]
-            };
-            myImputs.push(data);
-          }
-          this.alertSelectionIncidencia(myImputs);
-        }
-      this.serviApp.activarProgreso(false,this.TAG + metodo);
-      },
-      (error)=>{
-        this.serviApp.errorConeccion(error);
-      }
-    );  
-  }
-
-  alertSelectionIncidencia(myImputs){
-   let editar = this.alertCtrl.create({
-      title: 'Por que deseas reprogramar la fecha?',
-      inputs: myImputs,
-      buttons: [
-        {
-          text: 'Cancelar',
-          handler: data => {
-            console.log('Cancelar clicked' + JSON.stringify(data) );
-          }
-        },
-        {
-          text: 'Ok',
-          handler: data => {
-            let id_tipo_cita = 1;
-            if ( this.reprogramar.numeroVisita != 1 ) id_tipo_cita = 2
-            if( '['+JSON.stringify(data)+']' != '[undefined]'){
-              let body: any = {
-                "fecha": this.fecha,
-                "id_tipo_cita": id_tipo_cita,
-                "id_orden_servicio": this.visita.id_orden_servicio,
-                "id_cliente": this.visita.id_cliente,
-                "id_bloque_horario": this.reprogramar.bloque_horario.id_bloque_horario,
-                "id_empleado": this.visita.id_empleado
-              } 
-              console.log(body);
-              this.reprosProv.getBody(body)
-              .subscribe(
-                (res)=>{  
-                  this.serviApp.activarProgreso(false,this.TAG);
-                  this.serviApp.alecrtMsg('Su reprogramacion fue exitosa');
-                  this.navCtrl.push(ServicioPage);
-                },
-                (error)=>{
-                  this.serviApp.errorConeccion(error);
-                }
-              );             
-            } 
-          }
-        }
-      ]
-    });
-    editar.present();
-  }
-
-esValido(data): boolean{
+  esValido(data): boolean{
     if ( JSON.stringify(this.reprogramar)=='{}' ) {
       this.serviApp.alecrtMsg('Seleccione todo los campos');
       return false;
@@ -216,8 +140,30 @@ esValido(data): boolean{
   }
   
   enviarReprogramacion(){
-    if ( this.esValido(this.visita) )
-      this.getTipoIncidencias();
+    if ( this.esValido(this.visita) ){
+      let id_tipo_cita = 1;
+      if ( this.reprogramar.numeroVisita != 1 ) id_tipo_cita = 2
+      let body: any = {
+        "fecha": this.fecha,
+        "id_tipo_cita": id_tipo_cita,
+        "id_orden_servicio": this.visita.id_orden_servicio,
+        "id_cliente": this.visita.id_cliente,
+        "id_bloque_horario": this.reprogramar.bloque_horario.id_bloque_horario,
+        "id_empleado": this.visita.id_empleado
+      } 
+      console.log(body);
+      this.reprosProv.getBody(body)
+      .subscribe(
+        (res)=>{  
+          this.serviApp.activarProgreso(false,this.TAG);
+          this.serviApp.alecrtMsg('Su reprogramacion fue exitosa');
+          this.navCtrl.setRoot(ServicioPage);
+        },
+        (error)=>{
+          this.serviApp.errorConeccion(error);
+        }
+      );  
+    }
   }
 
 }

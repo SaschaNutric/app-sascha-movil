@@ -42,10 +42,12 @@
             <h2>Precio:</h2>
             <h2 align-center text-wrap>BsS {{s.servicio.precio}}</h2>
           </ion-item>
+        </div>
+        <div>
           <ion-item *ngIf="esMiServicio == true">
             <div *ngIf="s.estado_orden_servicio == 1">
               <h2 align="center" style="color: #35d503;"> En Proceso </h2>
-              <button ion-button color="f83c1d" block clear (click)="getTipoReclamos()" >Reclamar Servicio</button>
+              <button ion-button color="f83c1d" block clear (click)="getTipoReclamos()" style="background-color: antiquewhite;color: black;">Reclamar Servicio</button>
             </div>
             <h2 align="center" *ngIf="s.estado_orden_servicio == 2" style="color: #d3e00d;"> De Promocion  </h2>
             <h2 align="center" *ngIf="s.estado_orden_servicio == 3" style="color: #0d78e0;"> Por Garantia </h2>

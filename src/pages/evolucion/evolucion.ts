@@ -4,6 +4,7 @@ import { ModalController, ViewController ,IonicPage, NavController, NavParams, A
 
 import { ServicioPage } from '../../pages/servicio/servicio';
 
+import { TipoincideciasProvider } from '../../providers/tipoincidecias/tipoincidecias';
 import { MiordenserviciosProvider } from '../../providers/miordenservicios/miordenservicios';
 import { ProximavisitaProvider } from '../../providers/proximavisita/proximavisita';
 import { VisitasProvider } from '../../providers/visitas/visitas';
@@ -44,6 +45,7 @@ export class EvolucionPage {
     public modalCtrl: ModalController, 
     public alertCtrl: AlertController,
     public perfilesProv: PerfilesProvider,
+    public tipoincidenciasProv: TipoincideciasProvider,
     public calificacionesProv: CalificacionesProvider,
     public calificacionesServProv: CalificacionesServProvider,
     public visitasProv: VisitasProvider,
@@ -238,11 +240,15 @@ abrirValoracion(visita){
   }
 
   irReprogramar(visita){
+
+    /*
+
     this.navCtrl.push('DetallereprogramacionPage',{
       "visita": visita,
       "numeroVisita": this.numeroVisita,
       "id_cliente": this.id_cliente
     });
+    */
   }
 
   async peticionCalificacion(body,id): Promise<any> {
@@ -257,6 +263,57 @@ abrirValoracion(visita){
           this.serviApp.errorConeccion(error);
         }
       );
+  }
+
+  async getTipoIncidencias(): Promise<void> {
+    let metodo = ': metodo getTipoIncidencias';
+    this.serviApp.activarProgreso(true,this.TAG + metodo);
+    await this.tipoincidenciasProv.getAll()
+      .subscribe(
+      (res)=>{
+        console.log(res['data'])
+        let objetos: any[] = res['data'].motivos || [];
+        console.log(res['data'].motivos)
+        if (objetos.length != 0){
+          let myImputs:any =[];
+          for ( let i in objetos ){
+            let data:any = { 
+              type: 'radio',
+              label: objetos[i].descripcion,
+              value: objetos[i]
+            };
+            myImputs.push(data);
+          }
+          this.alertSelectionIncidencia(myImputs);
+        }
+      this.serviApp.activarProgreso(false,this.TAG + metodo);
+      },
+      (error)=>{
+        this.serviApp.errorConeccion(error);
+      }
+    );  
+  }
+
+  alertSelectionIncidencia(myImputs){
+   let editar = this.alertCtrl.create({
+      title: 'Por que deseas reprogramar la fecha?',
+      inputs: myImputs,
+      buttons: [
+        {
+          text: 'Cancelar',
+          handler: data => {
+            console.log('Cancelar clicked' + JSON.stringify(data) );
+          }
+        },
+        {
+          text: 'Ok',
+          handler: data => {
+                      
+          } 
+        }
+      ]
+    });
+    editar.present();
   }
 
   dismiss() {

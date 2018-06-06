@@ -55,6 +55,7 @@ export class FiltroPage {
     public filtrablesProv: TipoparametrosProvider,
     public especialidadesProv: EspecialidadesProvider,
     public serviApp: AppservicioProvider) {
+    console.log(JSON.stringify(params.data))
       let max = params.data.rangoPrecio.max;
       let min = params.data.rangoPrecio.min;
       this.filtro_top.ranges[0].max = max;

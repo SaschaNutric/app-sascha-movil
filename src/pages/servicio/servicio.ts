@@ -44,8 +44,8 @@ export class ServicioPage {
 
   public tipo_servicio: any=null;
 
-  public id_cliente: string = '';
-  public id_orden_servicio: string = '';
+  public id_cliente: string=null;
+  public id_orden_servicio: string=null;
 
   constructor(
     private storage: Storage,
@@ -123,6 +123,7 @@ export class ServicioPage {
   async getMiServicios(id): Promise<void> {
     let metodo = ': metodo getMiServicios';
     this.serviApp.activarProgreso(true,this.TAG + metodo);
+    this.id_cliente = id;
     await this.miserviciosProv.get(id)
       .subscribe(
       (res)=>{
@@ -165,25 +166,32 @@ export class ServicioPage {
   }
 
   showFilter() {
-    var precios: number[]=[];
-    var duraciones: number[]=[];
-    for ( let i in this.services ) {
-      precios.push( this.services[i].servicio.precio );
-      duraciones.push( this.services[i].servicio.numero_visitas );
+
+    if(this.services.length == 0){
+      this.getServicios();
     } 
-    let rangoPrecio: any = {
-      max: Math.max.apply(null, precios),
-      min: Math.min.apply(null, precios)
+    if( this.services.length != 0 ){
+
+      var precios: number[]=[];
+      var duraciones: number[]=[];
+      for ( let i in this.services ) {
+        precios.push( this.services[i].servicio.precio );
+        duraciones.push( this.services[i].servicio.numero_visitas );
+      } 
+      let rangoPrecio: any = {
+        max: Math.max.apply(null, precios),
+        min: Math.min.apply(null, precios)
+      }
+      let body: any = {
+        rangoPrecio: rangoPrecio,
+        max_duracion: Math.max.apply(null, duraciones)
+      }
+      let modal = this.modalCtrl.create('FiltroPage',body);
+      modal.onDidDismiss(data => {
+        if ( data.length != 0 ) this.getServiciosFiltrados(data);
+      });
+      modal.present();
     }
-    let body: any = {
-      rangoPrecio: rangoPrecio,
-      max_duracion: Math.max.apply(null, duraciones)
-    }
-    let modal = this.modalCtrl.create('FiltroPage',body);
-    modal.onDidDismiss(data => {
-     if ( data.length != 0 ) this.getServiciosFiltrados(data);
-   });
-    modal.present();
   }
 
   isParametro(parametros,id_parametro): boolean{
@@ -296,6 +304,7 @@ export class ServicioPage {
         {
           text: 'Ok',
           handler: data => {
+            console.log(data)
             if( '['+JSON.stringify(data)+']' != '[undefined]') this.Reclamar(data);
             else this.serviApp.alecrtMsg('Seleccione un motivo');
           }
@@ -306,7 +315,13 @@ export class ServicioPage {
   }
 
   async Reclamar(data){
-    await this.getMiOrdenServicios(this.id_cliente,data.id_motivo);
+    console.log('POLICE-------------------------------######')
+    if(this.id_cliente != null){
+      await this.getMiOrdenServicios(this.id_cliente,data.id_motivo);
+    } else {
+      await this.getCliente();
+      this.serviApp.alecrtMsg('Tu reclamo no se envio intente de nuevo')
+    }
   }
 
   async getMiOrdenServicios(id_cliente, id_motivo): Promise<void> {
@@ -315,9 +330,10 @@ export class ServicioPage {
     await this.ordenServiciosProv.get(id_cliente)
       .subscribe(
       (res)=>{
+        console.log(JSON.stringify(res))
         let orden_servicios = res['data'];
         this.id_orden_servicio = orden_servicios[0];
-        if ( this.id_cliente != '' && this.id_orden_servicio != '' ){
+        if ( this.id_cliente != null && this.id_orden_servicio != null ){
           this.reclamar({
             "id_motivo": id_motivo,
             "id_orden_servicio": this.id_orden_servicio
@@ -332,13 +348,14 @@ export class ServicioPage {
   }
 
   async reclamar(body){
+    console.log(JSON.stringify(body))
     let metodo = ': metodo reclamar';
     this.serviApp.activarProgreso(true,this.TAG + metodo);
     await this.reclamosProv.create(body).subscribe(
       (res)=>{
         this.serviApp.activarProgreso(false,this.TAG + metodo);
         this.serviApp.alecrtMsg('Su reclamo ya fue enviado');
-        this.navCtrl.push(ServicioPage);
+        this.navCtrl.setRoot(ServicioPage);
       },
       (error)=>{
         this.serviApp.errorConeccion(error);
