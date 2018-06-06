@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavParams } from 'ionic-angular';
+import { NavController, IonicPage, NavParams } from 'ionic-angular';
 
 import { VisitadetallesProvider } from '../../../providers/visitadetalles/visitadetalles';
 import { AppservicioProvider } from '../../../providers/appservicio/appservicio';
@@ -17,10 +17,11 @@ export class DetalleEvolucionPage {
   
   constructor(
     public navParams: NavParams,
+    public navCtrl: NavController,
     public detalleProv: VisitadetallesProvider,
     public serviApp: AppservicioProvider
     ) {
-    if (this.id_visita != null ) this.getDetalle(
+    this.getDetalle(
       navParams.data.visita.id_visita, navParams.data.id_orden_servicio);
   }
 
@@ -44,7 +45,8 @@ export class DetalleEvolucionPage {
   }
 
   verNotificaciones(){
-    
+     this.navCtrl.push('NotificacionesPage');
   }
+
 
 }

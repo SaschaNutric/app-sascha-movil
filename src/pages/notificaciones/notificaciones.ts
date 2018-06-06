@@ -36,7 +36,7 @@ export class NotificacionesPage {
     public serviApp: AppservicioProvider) { }
 
   stopTheIterations () {
-    this.subscription.unsubscribe ();
+    this.subscription.unsubscribe();
   }
 
   ngOnInit() {

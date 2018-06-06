@@ -6,7 +6,7 @@
     <content src="index.html" />
     <content original-src="index.html" />
     <access origin="*" />
-    <access origin="file:*" launch-external="true"/>
+    <access launch-external="true" origin="file:*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />

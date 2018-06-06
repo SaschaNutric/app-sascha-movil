@@ -2,10 +2,13 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { ModalController, ViewController ,IonicPage, NavController, NavParams, AlertController  } from 'ionic-angular';
 
+import { ServicioPage } from '../../pages/servicio/servicio';
+
 import { MiordenserviciosProvider } from '../../providers/miordenservicios/miordenservicios';
 import { ProximavisitaProvider } from '../../providers/proximavisita/proximavisita';
 import { VisitasProvider } from '../../providers/visitas/visitas';
 import { PerfilesProvider } from '../../providers/perfiles/perfiles';
+import { CalificacionesServProvider } from '../../providers/calificaciones-serv/calificaciones-serv';
 import { CalificacionesProvider } from '../../providers/calificaciones/calificaciones';
 import { AppservicioProvider } from '../../providers/appservicio/appservicio';
 
@@ -31,6 +34,7 @@ export class EvolucionPage {
   public id_orden_servicio: string = null;
   public proximaVisita: any=null;
   public numeroVisita: number = 1;
+  public finalizado: boolean = false;
 
   constructor(
     private storage: Storage,
@@ -41,6 +45,7 @@ export class EvolucionPage {
     public alertCtrl: AlertController,
     public perfilesProv: PerfilesProvider,
     public calificacionesProv: CalificacionesProvider,
+    public calificacionesServProv: CalificacionesServProvider,
     public visitasProv: VisitasProvider,
     public proximaVisitaProv: ProximavisitaProvider,
     public ordenServiciosProv: MiordenserviciosProvider,
@@ -114,15 +119,18 @@ export class EvolucionPage {
         "id_cliente": id_cliente,
         "id_orden_servicio": id_orden_servicio
       };
-    console.log(JSON.stringify(body))
     await this.visitasProv.getBody(body)
       .subscribe(
       (res)=>{
         this.visitas = res['data'];
+        let cont:number = 0;
         for ( let i in this.visitas ){
           this.numeroVisita = this.numeroVisita + 1;
           this.visitas[i].fecha_atencion = moment(this.visitas[i].fecha_atencion).format("DD/MM/YYYY");
+          if ( this.visitas[i].calificada == true ) cont = cont + 1;
         }
+        if( cont == this.visitas.length ) this.finalizado = true;
+        if( this.visitas.length != 0 && this.proximaVisita == null ) this.finalizado = true;
         
         //this.visitas.splice(0, 1);
         this.getProximaVisita(this.id_cliente);
@@ -148,16 +156,51 @@ export class EvolucionPage {
     );  
   }
 
- abrirValoracion(visita){
+  irValorarServicio(){
+    let cont: number = 0;
+    for( let i in this.visitas ){
+      if( this.visitas[i].calificada == true ) cont = cont +1;
+    }
+    console.log(cont);
+    if ( cont == this.visitas.length ) {
+
+      let metodo =':metodo irValorarServicio';
+      let modal = this.modalCtrl.create('ValoracionPage',{ 
+        "titulo":'Valorar servicio'
+      });
+      modal.onDidDismiss(data => {
+        if( '['+JSON.stringify(data)+']' != '[undefined]' ){
+          if( data.length != 0 && this.id_orden_servicio != null ){
+            this.serviApp.activarProgreso(true,this.TAG + metodo);
+            this.calificacionesServProv.createId(data,this.id_orden_servicio)
+            .subscribe(
+            (res)=>{
+              this.serviApp.alecrtMsg('Tu valoracion es muy importante gracias por tu ayuda');
+              this.navCtrl.setRoot(ServicioPage);
+            },
+            (error)=>{
+              this.serviApp.errorConeccion(error);
+            });  
+         }
+        }
+      });
+      modal.present();
+    } else {
+      this.serviApp.alecrtMsg('Valora todas las visitas para continuar');
+    }
+  }
+
+abrirValoracion(visita){
   let metodo =':metodo abrirValoracion';
-  console.log(JSON.stringify(visita))
     if (visita.calificada){
       this.navCtrl.push('DetalleEvolucionPage',{
         "visita": visita,
         "id_orden_servicio": this.id_orden_servicio
       });
     } else {
-      let modal = this.modalCtrl.create('ValoracionPage');
+      let modal = this.modalCtrl.create('ValoracionPage',{
+        "titulo":'Valorar visita'
+      });
       modal.onDidDismiss(data => {
         if( '['+JSON.stringify(data)+']' != '[undefined]' ){
           if( data.length != 0 ){
@@ -166,7 +209,14 @@ export class EvolucionPage {
             .subscribe(
             (res)=>{
               this.serviApp.alecrtMsg('Tu valoracion es muy importante gracias por tu ayuda');
-              window.location.reload();
+              let cont: number = 0;
+              for( let i in this.visitas ){
+                if ( this.visitas[i].id_visita == visita.id_visita ){
+                  this.visitas[i].calificada = true
+                  cont = cont + 1;
+                }
+              }
+              if ( cont == this.visitas.length )  this.finalizado = true;
             },
             (error)=>{
               this.serviApp.errorConeccion(error);

@@ -13,7 +13,7 @@
     <h2 align="center">Mis Notificaciones</h2>
   </ion-item>
   <br>
-  <ion-card *ngFor="let noti of notificaciones">
+  <ion-card *ngFor=" let noti of notificaciones">
     <ion-item>
       <ion-thumbnail item-start align-items-center>
         <h1 align="center" style="margin: auto; padding: 20%;">
@@ -43,7 +43,10 @@
           <button ion-button color="danger" (click)="limpiar(noti.id_notificacion)">
             <ion-icon name="trash"></ion-icon>Remover
           </button>
-          <button ion-button color="primary" *ngIf=" noti.tipo_notificacion == 2; else noti.tipo_notificacion == 7" (click)="solicitar(noti)">
+          <button ion-button color="primary" *ngIf=" noti.tipo_notificacion == 2;" (click)="solicitar(noti)">
+          <ion-icon name="checkmark"></ion-icon>Solicitar
+          </button>
+          <button ion-button color="primary" *ngIf=" noti.tipo_notificacion == 7;" (click)="solicitar(noti)">
           <ion-icon name="checkmark"></ion-icon>Solicitar
           </button>
         </ion-buttons>

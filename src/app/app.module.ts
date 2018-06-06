@@ -47,6 +47,8 @@ import { ProximacitaProvider } from '../providers/proximacita/proximacita';
 import { AgendareproProvider } from '../providers/agendarepro/agendarepro';
 import { NotifiProvider } from '../providers/notifi/notifi';
 import { CalificacionesProvider } from '../providers/calificaciones/calificaciones';
+import { CalificacionesServProvider } from '../providers/calificaciones-serv/calificaciones-serv';
+import { ValoracionesServProvider } from '../providers/valoraciones-serv/valoraciones-serv';
 
 @NgModule({
   declarations: [
@@ -106,7 +108,9 @@ import { CalificacionesProvider } from '../providers/calificaciones/calificacion
     NotificacionesProvider,
     AgendareproProvider,
     NotifiProvider,
-    CalificacionesProvider
+    CalificacionesProvider,
+    CalificacionesServProvider,
+    ValoracionesServProvider
   ]
 })
 export class AppModule {}

@@ -33,32 +33,42 @@
         <ion-grid>
            <ion-row>
               <ion-item>
-                 <h2 align="center">{{ p.parametro.tipo_parametro }}</h2>
-               </ion-item>
+                <h2 align="center">{{ p.parametro.tipo_parametro }}</h2>
+              </ion-item>
             </ion-row>
             <ion-row>
-                <ion-col>
-                    <p align="center">{{ p.parametro.nombre }}</p>
-                </ion-col>
-                <ion-col *ngIf="p.valor != null">
-                    <p align="center">{{ p.valor }} {{p.unidad}}</p>
-                </ion-col>
+              <ion-col>
+                <p align="center">{{ p.parametro.nombre }}</p>
+              </ion-col>
+              <ion-col *ngIf="p.valor != null">
+                <p align="center">{{ p.valor }} {{p.unidad}}</p>
+              </ion-col>
             </ion-row>
         </ion-grid>
       </ion-card>
     </ion-item>
   </ion-list>
   <ion-list *ngSwitchCase="'visita'">
-  <div>
-    <ion-item *ngIf="proximaVisita != null" >
-      <ion-card class="nueva" (click)="irReprogramar(proximaVisita)">
-        <br>
-        <h2 align="center" style="color: white;">VISITA #{{numeroVisita}}</h2>
-        <br>
-        <h2 align="center" style="color: white;">{{proximaVisita.fecha}} Reprogramar</h2>
-      </ion-card>
-    </ion-item>
-  </div>
+    <div *ngIf="this.finalizado == true" >
+      <ion-item *ngIf="proximaVisita == null" >
+        <ion-card class="nueva" (click)="irValorarServicio()">
+          <br>
+          <h2 align="center" style="color: white;">Tu servicio a finalizado</h2>
+          <br>
+          <h2 align="center" style="color: white;">Valora tu servicio</h2>
+        </ion-card>
+      </ion-item>
+    </div>
+    <div>
+      <ion-item *ngIf="proximaVisita != null" >
+        <ion-card class="nueva" (click)="irReprogramar(proximaVisita)">
+          <br>
+          <h2 align="center" style="color: white;">VISITA #{{numeroVisita}}</h2>
+          <br>
+          <h2 align="center" style="color: white;">{{proximaVisita.fecha}} Reprogramar</h2>
+        </ion-card>
+      </ion-item>
+    </div>
     <ion-item *ngFor="let v of visitas" >
       <ion-card class="anterior" (click)="abrirValoracion(v)">
         
