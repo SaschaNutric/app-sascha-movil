@@ -11,6 +11,8 @@ import { ReclamosProvider } from '../../providers/reclamos/reclamos';
 import { TiporeclamosProvider } from '../../providers/tiporeclamos/tiporeclamos';
 import { MiordenserviciosProvider } from '../../providers/miordenservicios/miordenservicios';
 
+import * as moment from 'moment';
+
 @Component({
   selector: 'page-servicio',
   templateUrl: 'servicio.html'
@@ -25,6 +27,7 @@ export class ServicioPage {
   public services: any[]=[];
   public aux_services: any[]=[];
   public promos: any[]=[];
+  public numeroPromo: number = 1;
 
   private esMiServicio: boolean = false;
   public titulo_servicio: any = 'Servicios';
@@ -144,6 +147,11 @@ export class ServicioPage {
       (res)=>{
         this.promos = res['data'];
         this.serviApp.activarProgreso(false,this.TAG + metodo);
+        for ( let i in this.promos ){
+          this.numeroPromo = this.numeroPromo + 1;
+          this.promos[i].valido_hasta = moment(this.promos[i].valido_hasta).format("DD/MM/YYYY");
+          this.promos[i].valido_desde = moment(this.promos[i].valido_desde).format("DD/MM/YYYY");
+        }
       },
       (error)=>{
         this.serviApp.errorConeccion(error);

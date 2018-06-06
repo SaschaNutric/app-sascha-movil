@@ -23,6 +23,10 @@
         <img src="{{promo.url_imagen}}" >
       </ion-thumbnail>
       <p text-wrap>{{ promo.descripcion }}</p>
+      <br>
+      <p text-wrap>Descuento de: {{ promo.descuento }}%</p>
+      <p>Valido desde: {{ promo.valido_desde }}</p>
+      <p>valido hasta: {{ promo.valido_hasta }}</p>
     </ion-item>
     <button ion-button color="primary" block clear (click)="solicitar()" >Solicitar Promocion</button>
   </ion-card>

@@ -70,11 +70,14 @@
       </ion-item>
     </div>
     <ion-item *ngFor="let v of visitas" >
-      <ion-card class="anterior" (click)="abrirValoracion(v)">
-        
+      <ion-card class="anterior" (click)="abrirValoracion(v)">   
         <h2 ion-button clear style="color: white">VISITA #{{v.numero}}</h2>
         <br>
-        <h2 align="center" style="color: white">{{ v.fecha_atencion }}</h2>
+        <h2 align="center" style="color: white">{{ v.fecha_atencion }}</h2>   
+        <h2 align="center">   
+          <ion-icon  style="color: white;" *ngIf="v.calificada == true" name="star"></ion-icon>
+          <ion-icon  style="color: white;" *ngIf="v.calificada == false" name="star-outline"></ion-icon>
+        </h2>
       </ion-card>
     </ion-item>
   </ion-list>

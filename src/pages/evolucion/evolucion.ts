@@ -14,7 +14,7 @@ import { AppservicioProvider } from '../../providers/appservicio/appservicio';
 
 import * as moment from 'moment';
 
-@IonicPage()
+@IonicPage() 
 @Component({
   selector: 'page-evolucion',
   templateUrl: 'evolucion.html',

@@ -39,6 +39,9 @@
       <h2 align="center">{{ servicio.servicio.plan_suplemento.nombre }}</h2>
       <p text-wrap>{{ servicio.servicio.plan_suplemento.descripcion }}</p>
     </ion-item>  
+    <ion-item>
+      <h2 align="center">Precio: BsS {{ servicio.servicio.precio }}</h2>
+    </ion-item>
     <ion-item *ngIf=" promocion != null ">
       <ion-item>
         <h2 align="center" text-wrap style="color: #92b740;">"Aprovecha esta oportunidad"</h2>

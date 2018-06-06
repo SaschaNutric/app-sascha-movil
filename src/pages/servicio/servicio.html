@@ -38,6 +38,9 @@
               <img src="{{ s.servicio.url_imagen }}" >
             </ion-thumbnail>
             <p text-wrap>{{ s.servicio.descripcion }}</p>
+            <br>
+            <h2>Precio:</h2>
+            <h2 align-center text-wrap>BsS {{s.servicio.precio}}</h2>
           </ion-item>
           <ion-item *ngIf="esMiServicio == true">
             <div *ngIf="s.estado_orden_servicio == 1">
@@ -61,6 +64,7 @@
               <img src="{{ p.servicio.url_imagen }}" >
             </ion-thumbnail>
             <p text-wrap>{{ p.descripcion }}</p>
+
           </ion-item>
         </div>
       </ion-item>
