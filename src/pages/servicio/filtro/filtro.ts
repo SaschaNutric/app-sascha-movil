@@ -13,6 +13,8 @@ import { AppservicioProvider } from '../../../providers/appservicio/appservicio'
 export class FiltroPage {
   filtro;
   public TAG:string = 'FiltroPage';
+  public esExtra: boolean = false;
+  public esEspecialidad: boolean = false;
   public filtrables:any[]=[];
   public filtro_top: any = {
     "ranges": [{
@@ -127,14 +129,17 @@ export class FiltroPage {
         text: 'Cancelar',
         handler: data => {
           console.log('Cancelar clicked');
+          this.dismiss();
         }
       } , {
         text: 'Ok',
         handler: data => {
+          this.esExtra = true;
           let objeto = {
             id_tipo_parametro: id_tipo_parametro,
             parametros: data
           };
+          console.log(JSON.stringify(objeto))
           let index: any = -1;
           if ( this.evalParametros.length == 0 ){
             this.evalParametros.push(objeto);
@@ -176,6 +181,15 @@ export class FiltroPage {
       "hasta": this.filtro_top.ranges[1].valor
     };
     let duracion: number = this.filtro_top.ranges[2].valor; 
+
+    if(!this.esExtra && id_parametros.length == 0 ){
+      for( let i in this.filtrables ){
+        for ( let y in this.filtrables[i].parametros ){
+          id_parametros.push(this.filtrables[i].parametros[y].id_parametro)
+        }
+      }
+    }
+
     this.viewCtrl.dismiss({
       "id_parametros": id_parametros,
       "id_especialidades": id_especialidades,

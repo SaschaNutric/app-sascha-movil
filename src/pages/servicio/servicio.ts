@@ -188,7 +188,9 @@ export class ServicioPage {
       }
       let modal = this.modalCtrl.create('FiltroPage',body);
       modal.onDidDismiss(data => {
-        if ( data.length != 0 ) this.getServiciosFiltrados(data);
+        if( '['+JSON.stringify(data)+']' != "[undefined]" ){
+          if ( data.length != 0 ) this.getServiciosFiltrados(data);  
+        }
       });
       modal.present();
     }
@@ -315,7 +317,6 @@ export class ServicioPage {
   }
 
   async Reclamar(data){
-    console.log('POLICE-------------------------------######')
     if(this.id_cliente != null){
       await this.getMiOrdenServicios(this.id_cliente,data.id_motivo);
     } else {
@@ -347,20 +348,36 @@ export class ServicioPage {
     );  
   }
 
-  async reclamar(body){
-    console.log(JSON.stringify(body))
+  reclamar(body){
     let metodo = ': metodo reclamar';
-    this.serviApp.activarProgreso(true,this.TAG + metodo);
-    await this.reclamosProv.create(body).subscribe(
-      (res)=>{
-        this.serviApp.activarProgreso(false,this.TAG + metodo);
-        this.serviApp.alecrtMsg('Su reclamo ya fue enviado');
-        this.navCtrl.setRoot(ServicioPage);
-      },
-      (error)=>{
-        this.serviApp.errorConeccion(error);
-      }
-    );
+    console.log(JSON.stringify(body))
+    var msg = 'Despues de esta accion su reclamo cancelara el servicio si desea continuar seleccione SI, Puesdes tambien dejar una queja en el menu de comunicacion si no deseas cancelar el servicio';
+    let alert = this.alertCtrl.create({
+      title:    'Mensaje',
+      subTitle: msg ,
+      buttons:  [{
+        text: "SI",
+        handler: data => {    
+          this.serviApp.activarProgreso(true,this.TAG + metodo);
+          this.reclamosProv.create(body).subscribe(
+            (res)=>{
+              this.serviApp.activarProgreso(false,this.TAG + metodo);
+              this.serviApp.alecrtMsg('Su reclamo ya fue enviado');
+              this.navCtrl.setRoot(ServicioPage);
+            },
+            (error)=>{
+              this.serviApp.errorConeccion(error);
+            }
+          );
+        } 
+      } , {
+        text: "NO",
+        handler: data => {
+          this.navCtrl.setRoot(ServicioPage);
+        } 
+      }]
+    });
+    alert.present();
   }
 
 }

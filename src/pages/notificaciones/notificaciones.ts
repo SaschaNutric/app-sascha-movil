@@ -96,8 +96,13 @@ export class NotificacionesPage {
   }
 
   solicitar(notificacion){
+    console.log(JSON.stringify(notificacion))
     this.tipo_notificacion = notificacion.tipo_notificacion;
     if ( notificacion.tipo_notificacion == 2 ) this.getPromocion(notificacion.id_promocion);
+    if ( notificacion.tipo_notificacion == 7 ){
+       this.titulo_servicio = "Servicio por Garantia";  
+       this.getServicio(notificacion.id_servicio);
+    } 
   }
 
   async limpiar(id_notificacion){
@@ -111,6 +116,7 @@ export class NotificacionesPage {
         this.navCtrl.push(ServicioPage);
       },
       (error)=>{
+        this.serviApp.activarProgreso(false,this.TAG + metodo);
         console.log(error);
       }
     );   

@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
 import { IonicPage, AlertController, ModalController, NavController, ViewController, NavParams } from 'ionic-angular';
 
-import { AppservicioProvider } from '../../../providers/appservicio/appservicio';
-import { BloquehorariosProvider } from '../../../providers/bloquehorarios/bloquehorarios';
-import { EmpleadosProvider } from '../../../providers/empleados/empleados';
+import { ServicioPage } from '../../../pages/servicio/servicio';
+
+import { AppservicioProvider }      from '../../../providers/appservicio/appservicio';
+import { BloquehorariosProvider }   from '../../../providers/bloquehorarios/bloquehorarios';
+import { EmpleadosProvider }        from '../../../providers/empleados/empleados';
 import { MotivosSolicitudProvider } from '../../../providers/motivos-solicitud/motivos-solicitud';
-import { SolicitudesProvider } from '../../../providers/solicitudes/solicitudes';
-import { Storage } from '@ionic/storage';
+import { SolicitudesProvider }      from '../../../providers/solicitudes/solicitudes';
+import { NotifiProvider }           from '../../../providers/notifi/notifi';
+import { Storage }                  from '@ionic/storage';
 
 @IonicPage()
 @Component({
@@ -44,6 +47,7 @@ export class SolicitudPage {
 		public modalCtrl: ModalController, 
 		public navParams: NavParams,
 		public viewCtrl: ViewController,
+    public notifiProv: NotifiProvider,
 		public serviApp: AppservicioProvider,
 		public horariosProv: BloquehorariosProvider,
 		public empleadosProv: EmpleadosProvider,
@@ -279,12 +283,46 @@ export class SolicitudPage {
       .subscribe(
         (res)=>{
           this.serviApp.alecrtMsg(res['data'].mensaje);
-          this.dismiss();
+
+          if(this.tipo_notificacion != null){
+            if(this.tipo_notificacion == 7){
+              this.storage.ready().then(() => {
+                this.storage.get('notificaciones').then( (notificaciones) => {
+                  for( let i in notificaciones ){
+                    if( notificaciones[i].tipo_notificacion == 7 ){
+                      this.limpiar(notificaciones[i].id_notificacion);
+                    }
+                  }
+                }).catch((err) =>{
+                  console.log(err);
+                });
+              });
+            }
+          }
+
+          this.navCtrl.setRoot(ServicioPage);
         },
         (error)=>{
           this.serviApp.errorConeccion(error);
         }
       ); 
+  }
+
+  async limpiar(id_notificacion){
+    let metodo = ': metodo limpiar';
+    this.serviApp.activarProgreso(true,this.TAG + metodo);
+    await this.notifiProv.delete(id_notificacion)
+      .subscribe(
+      (res)=>{
+        this.serviApp.activarProgreso(false,this.TAG + metodo);
+        this.storage.remove('notificaciones');
+        this.navCtrl.push(ServicioPage);
+      },
+      (error)=>{
+        this.serviApp.activarProgreso(false,this.TAG + metodo);
+        console.log(error);
+      }
+    );   
   }
 
   esValido(data): boolean{

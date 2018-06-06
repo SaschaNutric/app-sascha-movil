@@ -49,6 +49,7 @@ import { NotifiProvider } from '../providers/notifi/notifi';
 import { CalificacionesProvider } from '../providers/calificaciones/calificaciones';
 import { CalificacionesServProvider } from '../providers/calificaciones-serv/calificaciones-serv';
 import { ValoracionesServProvider } from '../providers/valoraciones-serv/valoraciones-serv';
+import { IncidenciasProvider } from '../providers/incidencias/incidencias';
 
 @NgModule({
   declarations: [
@@ -110,7 +111,8 @@ import { ValoracionesServProvider } from '../providers/valoraciones-serv/valorac
     NotifiProvider,
     CalificacionesProvider,
     CalificacionesServProvider,
-    ValoracionesServProvider
+    ValoracionesServProvider,
+    IncidenciasProvider
   ]
 })
 export class AppModule {}

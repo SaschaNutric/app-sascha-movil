@@ -5,6 +5,7 @@ import { ModalController, ViewController ,IonicPage, NavController, NavParams, A
 import { ServicioPage } from '../../pages/servicio/servicio';
 
 import { TipoincideciasProvider } from '../../providers/tipoincidecias/tipoincidecias';
+import { IncidenciasProvider }    from '../../providers/incidencias/incidencias';
 import { MiordenserviciosProvider } from '../../providers/miordenservicios/miordenservicios';
 import { ProximavisitaProvider } from '../../providers/proximavisita/proximavisita';
 import { VisitasProvider } from '../../providers/visitas/visitas';
@@ -46,6 +47,7 @@ export class EvolucionPage {
     public alertCtrl: AlertController,
     public perfilesProv: PerfilesProvider,
     public tipoincidenciasProv: TipoincideciasProvider,
+    public incidenciasProv: IncidenciasProvider,
     public calificacionesProv: CalificacionesProvider,
     public calificacionesServProv: CalificacionesServProvider,
     public visitasProv: VisitasProvider,
@@ -159,12 +161,14 @@ export class EvolucionPage {
   }
 
   irValorarServicio(){
-    let cont: number = 0;
+    let enc = false;
     for( let i in this.visitas ){
-      if( this.visitas[i].calificada == true ) cont = cont +1;
+      if( this.visitas[i].calificada == false ){
+        enc = true;
+        break;
+      } 
     }
-    console.log(cont);
-    if ( cont == this.visitas.length ) {
+    if (!enc) {
 
       let metodo =':metodo irValorarServicio';
       let modal = this.modalCtrl.create('ValoracionPage',{ 
@@ -240,15 +244,11 @@ abrirValoracion(visita){
   }
 
   irReprogramar(visita){
-
-    /*
-
     this.navCtrl.push('DetallereprogramacionPage',{
       "visita": visita,
       "numeroVisita": this.numeroVisita,
       "id_cliente": this.id_cliente
     });
-    */
   }
 
   async peticionCalificacion(body,id): Promise<any> {
@@ -271,7 +271,6 @@ abrirValoracion(visita){
     await this.tipoincidenciasProv.getAll()
       .subscribe(
       (res)=>{
-        console.log(res['data'])
         let objetos: any[] = res['data'].motivos || [];
         console.log(res['data'].motivos)
         if (objetos.length != 0){
@@ -308,7 +307,25 @@ abrirValoracion(visita){
         {
           text: 'Ok',
           handler: data => {
-                      
+            console.log(JSON.stringify(data))  
+            let body: any = {
+              "id_tipo_incidencia": 1,
+              "id_motivo": data.id_motivo,
+              "id_cita": this.proximaVisita.id_cita,
+              "id_agenda": this.proximaVisita.id_agenda
+            };
+            this.incidenciasProv.create(body)
+            .subscribe(
+              (res)=>{
+                console.log(JSON.stringify(res))
+                //this.serviApp.alecrtMsg('Tu peticion de reprogramacion fue enviada espere por la notificacion')
+                this.irReprogramar(this.proximaVisita)
+                //this.navCtrl.setRoot(ServicioPage);
+              },
+              (error)=>{
+                this.serviApp.errorConeccion(error);
+              }
+            );  
           } 
         }
       ]
